@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #121415;
+  --color-surface-base: #0F1112;
+  --color-surface-dim: #121415;
+  --color-surface-bright: #38393a;
+  --color-surface-container-lowest: #0c0e0f;
+  --color-surface-container-low: #1a1c1d;
+  --color-surface-container: #1e2021;
+  --color-surface-container-high: #282a2b;
+  --color-surface-container-highest: #333536;
+
+  --color-on-surface: #e2e2e3;
+  --color-on-surface-variant: #c1c8ca;
+  --color-on-background: #e2e2e3;
+  --color-background: #121415;
+
+  --color-outline: #8b9294;
+  --color-outline-variant: #41484a;
+
+  --color-primary: #a5cdd8;
+  --color-on-primary: #09353e;
+  --color-primary-container: #4a707a;
+  --color-on-primary-container: #caf2fe;
+  --color-slate-teal: #4A707A;
+
+  --color-secondary: #c2c4e3;
+  --color-on-secondary: #2b2f47;
+  --color-muted-indigo: #636681;
+
+  --color-tertiary: #b0ceb2;
+  --color-on-tertiary: #1c3622;
+  --color-sage-gray: #8BA88E;
+
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+
+  --font-display: "League Spartan", sans-serif;
+  --font-body: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --spacing-gutter: 24px;
+  --spacing-margin-desktop: 80px;
+  --spacing-margin-mobile: 20px;
+
+  --radius-base: 8px;
+  --radius-container: 16px;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--color-surface-base);
+    color: var(--color-on-background);
+    font-family: var(--font-body);
+  }
+}
