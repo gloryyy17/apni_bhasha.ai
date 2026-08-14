@@ -6,6 +6,7 @@ function LearningSession() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const topic = params.get("topic") || "light";
+  const answer = params.get("answer");
 
   const [lesson, setLesson] = useState(null);
   const [levelIndex, setLevelIndex] = useState(0);
@@ -52,6 +53,17 @@ function LearningSession() {
 
   return (
     <div className="min-h-screen px-margin-mobile md:px-margin-desktop py-8 max-w-lg mx-auto">
+      {answer && (
+        <div className="bg-primary/10 border border-primary/30 rounded-container p-6 mb-6">
+          <span className="font-mono text-xs text-primary uppercase tracking-widest">
+            AI Explanation
+          </span>
+
+          <p className="font-body text-base text-on-surface mt-3">
+            {answer}
+          </p>
+       </div>
+      )}
       <div className="flex justify-between items-center mb-2">
         <span className="font-mono text-xs text-on-surface-variant uppercase tracking-widest">{lesson.title}</span>
         <span className="font-mono text-xs text-on-surface-variant">Level {levelIndex + 1} of {lesson.levels.length}</span>

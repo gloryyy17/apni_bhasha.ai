@@ -1,11 +1,25 @@
-import { mockLessons } from "../data/mockLessons";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
-// TODO: Replace mock implementation with backend API
 export async function sendVoiceQuery(text) {
-  await new Promise((r) => setTimeout(r, 1200)); // simulate processing
-  // naive keyword match for the demo
-  if (text.toLowerCase().includes("light") || text.includes("प्रकाश") || text.includes("roshni")) {
-    return { topic: "light", class: "8", subject: "Science" };
+  try {
+    const response = await fetch(`${API_BASE_URL}/ai/query`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "AI request failed");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("AI API Error:", error);
+    throw error;
   }
-  return { topic: "light", class: "8", subject: "Science" }; // fallback for demo
 }

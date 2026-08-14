@@ -27,7 +27,9 @@ function Dashboard() {
     }
     const result = await sendVoiceQuery(query);
     setProcessing(false);
-    navigate(`/learning?topic=${result.topic}`);
+    navigate(
+      `/learning?topic=${result.topic}&answer=${encodeURIComponent(result.answer)}`
+    );
   };
 
   if (processing) {
