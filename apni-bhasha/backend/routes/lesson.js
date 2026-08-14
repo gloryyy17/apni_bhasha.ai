@@ -124,9 +124,25 @@ const lessons = {
   },
 };
 
-router.post("/generate", (req, res) => {
+const languageNames = {
+  hi: "Hindi",
+  bn: "Bengali",
+  te: "Telugu",
+  ta: "Tamil",
+  mr: "Marathi",
+  kn: "Kannada",
+  gu: "Gujarati",
+  pa: "Punjabi",
+  ml: "Malayalam",
+  or: "Odia",
+  as: "Assamese",
+  ur: "Urdu",
+  en: "English",
+};
+
+router.post("/generate", async (req, res) => {
   try {
-    const { topic } = req.body;
+    const { topic, language } = req.body;
 
     if (!topic) {
       return res.status(400).json({
@@ -135,11 +151,100 @@ router.post("/generate", (req, res) => {
       });
     }
 
-    const lesson = lessons[topic] || lessons.light;
+    const baseLesson = lessons[topic] || lessons.light;
+
+    const selectedLanguage = language || "en";
+    const languageName =
+      languageNames[selectedLanguage] || selectedLanguage;
+
+    // English lesson requested
+    if (selectedLanguage === "en") {
+      return res.json({
+        success: true,
+        lesson: baseLesson,
+      });
+    }
+
+    const prompt = `
+You are Apni Bhasha, an educational AI for school students.
+
+Translate and adapt the following Class 8 lesson into ${languageName}.
+
+IMPORTANT RULES:
+1. Return ONLY valid JSON.
+2. Keep exactly the same number of levels.
+3. Keep the same level IDs.
+4. Keep the same type for every level.
+5. Translate the title.
+6. Translate every explanation.
+7. Translate every MCQ question.
+8. Translate every option.
+9. Translate every explanation.
+10. The correctAnswer MUST exactly match one of the translated options.
+11. Do not add markdown.
+12. Use simple language suitable for a Class 8 student.
+13. Use the native script of ${languageName}.
+
+Return exactly this structure:
+
+{
+  "id": "${baseLesson.id}",
+  "title": "translated title",
+  "subject": "Science",
+  "class": "8",
+  "levels": [
+    {
+      "id": 1,
+      "type": "explanation",
+      "title": "translated title",
+      "content": "translated content"
+    }
+  ]
+}
+
+Original lesson:
+${JSON.stringify(baseLesson)}
+`;
+
+    const response = await fetch("http://localhost:11434/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gemma2:2b",
+        prompt,
+        stream: false,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText);
+    }
+
+    const data = await response.json();
+
+    let translatedLesson;
+
+    try {
+      const cleaned = data.response
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+      translatedLesson = JSON.parse(cleaned);
+    } catch (parseError) {
+      console.error("Lesson JSON Parse Error:", parseError);
+
+      // Fallback to English lesson if AI JSON fails
+      translatedLesson = baseLesson;
+    }
 
     res.json({
       success: true,
-      lesson,
+      lesson: translatedLesson,
+      language: selectedLanguage,
     });
   } catch (error) {
     console.error("Lesson API Error:", error);
@@ -147,6 +252,7 @@ router.post("/generate", (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to generate lesson.",
+      error: error.message,
     });
   }
 });
